@@ -154,7 +154,7 @@ export class hsoub{
       for (let i = 0; i < owners.length; i++) {
           result.community_owners.push({
             user: decodeURIComponent((<string>owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/",""))).trim(),
-            user_name: (<string>owners[i].querySelector(".userCardHeaderText a").innerHTML).trim(),
+
             user_avatar: <string>owners[i].querySelector("img")["src"],
             user_name: (<string>owners[i].querySelector("span.full_name").innerHTML).trim(),
           });

@@ -156,7 +156,6 @@ var hsoub = (function () {
             for (var i = 0; i < owners.length; i++) {
                 result.community_owners.push({
                     user: decodeURIComponent(owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")).trim(),
-                    user_name: owners[i].querySelector(".userCardHeaderText a").innerHTML.trim(),
                     user_avatar: owners[i].querySelector("img")["src"],
                     user_name: owners[i].querySelector("span.full_name").innerHTML.trim(),
                 });
