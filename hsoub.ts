@@ -5,7 +5,7 @@ export class io {
     constructor(private email: string, private password: string) {
 
     }
-    public search(keywords: Array<string>, searchIn: string, callback: (results: Array<JSON>) => any): Boolean {
+    public search(keywords: Array<string>, searchIn: string, callback: (results: Array<JSON>) => any): io {
         var search: string = keywords.join(" "),
             options;
         if (searchIn == null) searchIn = "";
@@ -103,10 +103,10 @@ export class io {
                 }
             }
         });
-        return true;
+        return this;
     }
 
-    public community(communityId: string, searchIn: string, callback: (results: any) => any): boolean {
+    public community(communityId: string, searchIn: string, callback: (results: any) => any): io {
         var req = request({
             url: `https://io.hsoub.com/${communityId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
@@ -197,10 +197,10 @@ export class io {
                 }
             }
         });
-        return true;
+        return this;
     }
 
-    public user(userId: string, searchIn: string | null, callback: (results: Array<JSON>) => any): boolean {
+    public user(userId: string, searchIn: string | null, callback: (results: Array<JSON>) => any): io {
         var req = request({
             url: `https://io.hsoub.com/u/${userId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
@@ -263,6 +263,6 @@ export class io {
                 }
             }
         });
-        return true;
+        return this;
     }
 }

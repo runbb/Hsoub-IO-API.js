@@ -107,7 +107,7 @@ var io = (function () {
                 }
             }
         });
-        return true;
+        return this;
     };
     io.prototype.community = function (communityId, searchIn, callback) {
         var req = request({
@@ -195,7 +195,7 @@ var io = (function () {
                 }
             }
         });
-        return true;
+        return this;
     };
     io.prototype.user = function (userId, searchIn, callback) {
         var req = request({
@@ -259,7 +259,7 @@ var io = (function () {
                 }
             }
         });
-        return true;
+        return this;
     };
     return io;
 }());
