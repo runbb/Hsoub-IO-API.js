@@ -1,12 +1,12 @@
 "use strict";
 var request = require("request");
 var Document = require("jsdom").jsdom;
-var hsoub = (function () {
-    function hsoub(username, password) {
+var io = (function () {
+    function io(username, password) {
         this.username = username;
         this.password = password;
     }
-    hsoub.prototype.search = function (keywords, searchIn, callback) {
+    io.prototype.search = function (keywords, searchIn, callback) {
         var search = keywords.join(" "), options;
         if (searchIn == null)
             searchIn = "";
@@ -109,7 +109,7 @@ var hsoub = (function () {
         });
         return true;
     };
-    hsoub.prototype.community = function (communityId, searchIn, callback) {
+    io.prototype.community = function (communityId, searchIn, callback) {
         var req = request({
             url: "https://io.hsoub.com/" + communityId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
@@ -197,7 +197,7 @@ var hsoub = (function () {
         });
         return true;
     };
-    hsoub.prototype.user = function (userId, searchIn, callback) {
+    io.prototype.user = function (userId, searchIn, callback) {
         var req = request({
             url: "https://io.hsoub.com/u/" + userId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
@@ -261,9 +261,6 @@ var hsoub = (function () {
         });
         return true;
     };
-    return hsoub;
+    return io;
 }());
-exports.hsoub = hsoub;
-(new hsoub("username", "password")).community("webdev", null, function (results) {
-    console.log(results);
-});
+exports.io = io;

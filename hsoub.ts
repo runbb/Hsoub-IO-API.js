@@ -1,7 +1,7 @@
 declare var require;
 import request = require("request");
 var Document = require("jsdom").jsdom;
-export class hsoub {
+export class io {
     constructor(private username: string, private password: string) {
 
     }
@@ -266,7 +266,3 @@ export class hsoub {
         return true;
     }
 }
-
-(new hsoub("username", "password")).community("webdev", null, (results) => {
-    console.log(results);
-});
