@@ -5,7 +5,18 @@ var io = (function () {
     function io(email, password) {
         this.email = email;
         this.password = password;
+        if (email != null || password != null)
+            this.login();
     }
+    Object.defineProperty(io.prototype, "registerURL", {
+        get: function () {
+            return "https://accounts.hsoub.com/register";
+        },
+        enumerable: true,
+        configurable: true
+    });
+    io.prototype.login = function () {
+    };
     io.prototype.search = function (keywords, searchIn, callback) {
         var search = keywords.join(" "), options;
         if (searchIn == null)
@@ -197,7 +208,7 @@ var io = (function () {
         });
         return this;
     };
-    io.prototype.user = function (userId, searchIn, callback) {
+    io.prototype.profile = function (userId, searchIn, callback) {
         var req = request({
             url: "https://io.hsoub.com/u/" + userId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
@@ -206,7 +217,16 @@ var io = (function () {
                 throw Error("Network Error");
             }
             var document = Document(res.body);
-            var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
+            var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
+                userId: userId,
+                user: document.querySelector(".username").innerHTML.trim(),
+                username: document.querySelector(".full_name").innerHTML.trim(),
+                user_avatar: document.querySelector(".pull-right img")["src"].trim(),
+                points: parseInt(document.querySelectorAll(".pull-right b")[0].innerHTML.trim()),
+                register_date: new Date((document.querySelectorAll(".pull-right b")[1].innerHTML.trim()).split("/").reverse().join("-")),
+                last_enter: document.querySelectorAll(".pull-right b")[2].innerHTML.trim(),
+                results: []
+            };
             for (var i = 0; i < elements.length; i++) {
                 var item = elements[i], data;
                 if (searchIn == "comments") {
@@ -216,7 +236,7 @@ var io = (function () {
                         comment: item.querySelector(".post-title a").innerHTML.trim(),
                         comment_id: parseInt(item.id.replace("comment-", "")),
                         comment_url: item.querySelector(".post-title a")["href"].trim(),
-                        user: userId,
+                        userId: userId,
                         community: item.querySelector(".post_community")["href"].replace("/", "").trim(),
                         community_name: item.querySelector(".post_community")["innerHTML"].split(">")[2].trim(),
                         community_url: item.querySelector(".post_community")["href"].trim()
@@ -232,15 +252,16 @@ var io = (function () {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >")[1];
+                        username = username.split("<br >");
                     }
                     data = {
                         post_id: parseInt(item.id.replace("post-", "")),
                         post_vote: item.querySelector(".post_points").innerHTML.trim(),
                         post_title: item.querySelector(".postContent a").innerHTML.trim(),
                         post_url: item.querySelector(".postContent a")["href"].trim(),
-                        user: decodeURIComponent(item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
-                        user_name: username.trim(),
+                        userId: decodeURIComponent(item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
+                        user: username[0].trim(),
+                        user_name: username[1].trim(),
                         user_avatar: item.querySelector(".usr26 img")["src"].trim(),
                         user_url: item.querySelector(".usr26")["href"].trim(),
                         community: item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "").trim(),
@@ -252,13 +273,19 @@ var io = (function () {
                         data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
                     }
                 }
-                result.push(data);
+                result.results.push(data);
                 if (i + 1 == elements.length) {
                     callback(result);
                     req.abort();
                 }
             }
         });
+        return this;
+    };
+    io.prototype.post = function (postId, callback) {
+        return this;
+    };
+    io.prototype.comment = function (commentId, callback) {
         return this;
     };
     return io;

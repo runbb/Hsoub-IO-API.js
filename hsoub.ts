@@ -1,10 +1,20 @@
 declare var require;
 import request = require("request");
-var Document = require("jsdom").jsdom;
+const Document = require("jsdom").jsdom;
 export class io {
-    constructor(private email: string, private password: string) {
+    constructor(private email?: string, private password?: string) {
+      if(email != null || password !=null)
+        this.login();
+    }
+
+    public get registerURL(): string{
+      return "https://accounts.hsoub.com/register";
+    }
+
+    private login(){
 
     }
+
     public search(keywords: Array<string>, searchIn: string, callback: (results: Array<JSON>) => any): io {
         var search: string = keywords.join(" "),
             options;
@@ -200,7 +210,7 @@ export class io {
         return this;
     }
 
-    public user(userId: string, searchIn: string | null, callback: (results: Array<JSON>) => any): io {
+    public profile(userId: string, searchIn: string | null, callback: (results: Array<JSON>) => any): io {
         var req = request({
             url: `https://io.hsoub.com/u/${userId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
@@ -210,7 +220,16 @@ export class io {
             }
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
-                result: Array<JSON> = [];
+                result: JSON| any = {
+                  userId: userId,
+                  user: (<string>document.querySelector(".username").innerHTML).trim(),
+                  username: (<string>document.querySelector(".full_name").innerHTML).trim(),
+                  user_avatar: (<string>document.querySelector(".pull-right img")["src"]).trim(),
+                  points: parseInt((<string>document.querySelectorAll(".pull-right b")[0].innerHTML).trim()),
+                  register_date: new Date(((<string>document.querySelectorAll(".pull-right b")[1].innerHTML).trim()).split("/").reverse().join("-")),
+                  last_enter: (<string>document.querySelectorAll(".pull-right b")[2].innerHTML).trim(),
+                  results:[]
+                };
             for (let i = 0; i < elements.length; i++) {
                 var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
                     data;
@@ -221,13 +240,13 @@ export class io {
                         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
                         comment_id: parseInt(item.id.replace("comment-", "")),
                         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
-                        user: userId,
+                        userId: userId,
                         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
                         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
                         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
                     };
                 } else {
-                    var username: String = <string>item.querySelector(".usr26 img")["alt"];
+                    var username:any = <string>item.querySelector(".usr26 img")["alt"];
                     var commentsCounter = <string>item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
                         .replace("تعليق واحد", "1")
                         .replace("تعليقان", "2")
@@ -236,15 +255,16 @@ export class io {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >")[1];
+                        username = username.split("<br >");
                     }
                     data = {
                         post_id: parseInt(item.id.replace("post-", "")),
                         post_vote: (<string>item.querySelector(".post_points").innerHTML).trim(),
                         post_title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
                         post_url: (<string>item.querySelector(".postContent a")["href"]).trim(),
-                        user: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
-                        user_name: username.trim(),
+                        userId: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
+                        user: <string>username[0].trim(),
+                        user_name: <string>username[1].trim(),
                         user_avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
                         user_url: (<string>item.querySelector(".usr26")["href"]).trim(),
                         community: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "")).trim(),
@@ -256,7 +276,7 @@ export class io {
                         data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
                     }
                 }
-                result.push(data)
+                result.results.push(data)
                 if (i + 1 == elements.length) {
                     callback(result);
                     req.abort();
@@ -264,5 +284,15 @@ export class io {
             }
         });
         return this;
+    }
+
+    public post(postId: number, callback: (results: Array<JSON>) => any):io{
+
+      return this;
+    }
+
+    public comment(commentId, callback: (results: JSON) => any):io{
+
+      return this;
     }
 }
