@@ -62,7 +62,7 @@ var io = (function () {
             method: "get",
         }, function (err, res) {
             if (err) {
-                throw Error("Network Error");
+                callback(err, null);
             }
             var document = Document(res.body);
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
@@ -113,7 +113,7 @@ var io = (function () {
                 }
                 result.push(data);
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null, result);
                     req.abort();
                 }
             }
@@ -126,7 +126,7 @@ var io = (function () {
             method: "get",
         }, function (err, res) {
             if (err) {
-                throw Error("Network Error");
+                callback(err, null);
             }
             var document = Document(res.body);
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
@@ -201,7 +201,7 @@ var io = (function () {
                 }
                 result.communitySubjects.push(data);
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null, result);
                     req.abort();
                 }
             }
@@ -214,7 +214,7 @@ var io = (function () {
             method: "get",
         }, function (err, res) {
             if (err) {
-                throw Error("Network Error");
+                callback(err, null);
             }
             var document = Document(res.body);
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
@@ -275,7 +275,7 @@ var io = (function () {
                 }
                 result.results.push(data);
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null, result);
                     req.abort();
                 }
             }

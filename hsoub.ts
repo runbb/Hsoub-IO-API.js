@@ -15,7 +15,7 @@ export class io {
 
     }
 
-    public search(keywords: Array<string>, searchIn: string, callback: (results: Array<JSON>) => any): io {
+    public search(keywords: Array<string>, searchIn: string, callback: (err: Error, results: Array<JSON>) => any): io {
         var search: string = keywords.join(" "),
             options;
         if (searchIn == null) searchIn = "";
@@ -54,7 +54,7 @@ export class io {
             method: "get",
         }, (err, res) => {
             if (err) {
-                throw Error("Network Error");
+                callback(err,null);
             }
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
@@ -108,7 +108,7 @@ export class io {
                 }
                 result.push(data)
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null,result);
                     req.abort();
                 }
             }
@@ -116,13 +116,13 @@ export class io {
         return this;
     }
 
-    public community(communityId: string, searchIn: string, callback: (results: any) => any): io {
+    public community(communityId: string, searchIn: string, callback: (err: Error, results: any) => any): io {
         var req = request({
             url: `https://io.hsoub.com/${communityId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
         }, (err, res) => {
             if (err) {
-                throw Error("Network Error");
+                callback(err,null);
             }
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
@@ -202,7 +202,7 @@ export class io {
                 }
                 result.communitySubjects.push(data)
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null,result);
                     req.abort();
                 }
             }
@@ -210,13 +210,13 @@ export class io {
         return this;
     }
 
-    public profile(userId: string, searchIn: string | null, callback: (results: Array<JSON>) => any): io {
+    public profile(userId: string, searchIn: string | null, callback: (err: Error, results: Array<JSON>) => any): io {
         var req = request({
             url: `https://io.hsoub.com/u/${userId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
         }, (err, res) => {
             if (err) {
-                throw Error("Network Error");
+                callback(err,null);
             }
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
@@ -278,7 +278,7 @@ export class io {
                 }
                 result.results.push(data)
                 if (i + 1 == elements.length) {
-                    callback(result);
+                    callback(null,result);
                     req.abort();
                 }
             }
@@ -286,12 +286,12 @@ export class io {
         return this;
     }
 
-    public post(postId: number, callback: (results: Array<JSON>) => any):io{
+    public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
 
       return this;
     }
 
-    public comment(commentId, callback: (results: JSON) => any):io{
+    public comment(commentId, callback: (err: Error, results: JSON) => any):io{
 
       return this;
     }
