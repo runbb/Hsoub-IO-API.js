@@ -66,12 +66,16 @@ var io = (function () {
             }
             var document = Document(res.body);
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
+            if (elements.length == 0) {
+                callback(null, result);
+                req.abort();
+            }
             for (var i = 0; i < elements.length; i++) {
                 var item = elements[i], data;
                 if (searchIn.split("/")[0] == "comments") {
                     data = {
                         post: {
-                            id: '',
+                            id: item.querySelector(".comment_post")["href"].match(/(\d+[0-9]\-)/g)[0].replace("-", ""),
                             title: item.querySelector(".comment_post").innerHTML.split("\n")[2].trim(),
                             url: item.querySelector(".comment_post")["href"].trim(),
                         },
@@ -143,55 +147,73 @@ var io = (function () {
                 callback(err, null);
             }
             var document = Document(res.body);
-            var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
+            if (document.querySelector(".errorBox")) {
+                callback(new Error("404"), null);
+                return;
+            }
+            var elements = document.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
                 id: communityId,
-                name: document.body.querySelector(".communities .block h2").innerHTML.trim(),
+                name: document.querySelector(".block h2.underline").innerHTML.trim(),
                 url: "/" + communityId,
                 about_url: "/" + communityId + "/about",
-                followers: document.body.querySelector(".communities .communityFollower span").innerHTML.trim(),
-                image: document.body.querySelector(".communities .block img")["src"].trim(),
-                description: document.body.querySelector(".communities .block p").innerHTML.split("<")[0].trim(),
+                followers: document.body.querySelector(".communityFollower span").innerHTML.trim(),
+                image: document.body.querySelector(".block img")["src"].trim(),
+                description: document.body.querySelector(".block p").innerHTML.split("<")[0].trim(),
                 lastcomments: [],
                 best_contributors: [],
                 owners: [],
                 subjects: [],
             };
-            var lastcomments = document.body.querySelectorAll(".latestComments")[0].querySelectorAll("li");
-            var best_contributors = document.body.querySelectorAll(".latestComments")[1].querySelectorAll("li");
-            var owners = document.body.querySelectorAll(".latestComments")[2].querySelectorAll("li");
-            for (var i = 0; i < lastcomments.length; i++) {
-                result.lastcomments.push({
-                    comment: {
-                        id: parseInt(lastcomments[i].id.replace("latest_comment-", "").trim()),
-                        comment: lastcomments[i].querySelector(".comTxt .commentTxt").innerHTML.trim(),
-                        url: lastcomments[i].querySelector(".comTxt .commentTxt")["href"].trim(),
-                    },
-                    user: {
-                        id: lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", "").trim(),
-                        user: decodeURIComponent(lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", "")).trim(),
-                        name: lastcomments[i].querySelector(".comTxt a").innerHTML.trim(),
-                        avatar: lastcomments[i].querySelector("img")["src"],
-                        url: lastcomments[i].querySelector(".comTxt a")["href"],
-                    },
-                });
+            var query = document.querySelectorAll(".latestComments");
+            var lastcomments;
+            var best_contributors;
+            var owners;
+            if (query.length >= 1) {
+                lastcomments = query[0].querySelectorAll("li");
+                for (var i = 0; i < lastcomments.length; i++) {
+                    result.lastcomments.push({
+                        comment: {
+                            id: parseInt(lastcomments[i].id.replace("latest_comment-", "").trim()),
+                            comment: lastcomments[i].querySelector(".comTxt .commentTxt").innerHTML.trim(),
+                            url: lastcomments[i].querySelector(".comTxt .commentTxt")["href"].trim(),
+                        },
+                        user: {
+                            id: lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", "").trim(),
+                            user: decodeURIComponent(lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", "")).trim(),
+                            name: lastcomments[i].querySelector(".comTxt a").innerHTML.trim(),
+                            avatar: lastcomments[i].querySelector("img")["src"],
+                            url: lastcomments[i].querySelector(".comTxt a")["href"],
+                        },
+                    });
+                }
             }
-            for (var i = 0; i < best_contributors.length; i++) {
-                result.best_contributors.push({
-                    id: best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/", "").trim(),
-                    user: decodeURIComponent(best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/", "").trim()),
-                    name: best_contributors[i].querySelector(".comTxt div a.username").innerHTML.trim(),
-                    avatar: best_contributors[i].querySelector("img")["src"],
-                    url: best_contributors[i].querySelector(".comTxt div a.username")["href"].trim(),
-                });
+            if (query.length >= 2) {
+                best_contributors = query[1].querySelectorAll("li");
+                for (var i = 0; i < best_contributors.length; i++) {
+                    result.best_contributors.push({
+                        id: best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/", "").trim(),
+                        user: decodeURIComponent(best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/", "").trim()),
+                        name: best_contributors[i].querySelector(".comTxt div a.username").innerHTML.trim(),
+                        avatar: best_contributors[i].querySelector("img")["src"],
+                        url: best_contributors[i].querySelector(".comTxt div a.username")["href"].trim(),
+                    });
+                }
             }
-            for (var i = 0; i < owners.length; i++) {
-                result.owners.push({
-                    id: owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "").trim(),
-                    user: decodeURIComponent(owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")).trim(),
-                    avatar: owners[i].querySelector("img")["src"],
-                    name: owners[i].querySelector("span.full_name").innerHTML.trim(),
-                    url: "/u/" + owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")
-                });
+            if (query.length >= 3) {
+                owners = query[2].querySelectorAll("li");
+                for (var i = 0; i < owners.length; i++) {
+                    result.owners.push({
+                        id: owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "").trim(),
+                        user: decodeURIComponent(owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")).trim(),
+                        avatar: owners[i].querySelector("img")["src"],
+                        name: owners[i].querySelector("span.full_name").innerHTML.trim(),
+                        url: "/u/" + owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")
+                    });
+                }
+            }
+            if (elements.length == 0) {
+                callback(null, result);
+                req.abort();
             }
             for (var i = 0; i < elements.length; i++) {
                 var item = elements[i], username = item.querySelector(".usr26 img")["alt"], data, commentsCounter = item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
@@ -226,7 +248,7 @@ var io = (function () {
                     commants_count: parseInt((commentsCounter).trim()),
                 };
                 if (item.querySelector(".post_image img") != undefined && item.querySelector(".post_image img") != null) {
-                    data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
+                    data.post["thumbnail"] = item.querySelector(".post_image img")["src"];
                 }
                 result.subjects.push(data);
                 if (i + 1 == elements.length) {
@@ -246,6 +268,10 @@ var io = (function () {
                 callback(err, null);
             }
             var document = Document(res.body);
+            if (document.querySelector(".errorBox")) {
+                callback(new Error("404"), null);
+                return;
+            }
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
                 id: userId,
                 user: document.querySelector(".username").innerHTML.trim(),
@@ -253,9 +279,13 @@ var io = (function () {
                 avatar: document.querySelector(".pull-right img")["src"].trim(),
                 points: parseInt(document.querySelectorAll(".pull-right b")[0].innerHTML.trim()),
                 register_date: new Date((document.querySelectorAll(".pull-right b")[1].innerHTML.trim()).split("/").reverse().join("-")),
-                last_enter: document.querySelectorAll(".pull-right b")[2].innerHTML.trim(),
+                last_enter: document.querySelectorAll(".pull-right b")[2] ? document.querySelectorAll(".pull-right b")[2].innerHTML.trim() : undefined,
                 results: []
             };
+            if (elements.length == 0) {
+                callback(null, result);
+                req.abort();
+            }
             for (var i = 0; i < elements.length; i++) {
                 var item = elements[i], data;
                 if (searchIn == "comments") {
@@ -305,8 +335,8 @@ var io = (function () {
                         },
                         user: {
                             id: decodeURIComponent(item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
-                            user: username[0].trim(),
-                            name: username[1].trim(),
+                            user: document.querySelector(".username").innerHTML.trim(),
+                            name: document.querySelector(".full_name").innerHTML.trim(),
                             avatar: item.querySelector(".usr26 img")["src"].trim(),
                             url: item.querySelector(".usr26")["href"].trim(),
                         },
@@ -318,7 +348,7 @@ var io = (function () {
                         commants_count: parseInt((commentsCounter).trim()),
                     };
                     if (item.querySelector(".post_image img") != undefined && item.querySelector(".post_image img") != null) {
-                        data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
+                        data.post["thumbnail"] = item.querySelector(".post_image img")["src"];
                     }
                 }
                 result.results.push(data);
