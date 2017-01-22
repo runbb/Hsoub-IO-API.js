@@ -333,11 +333,4 @@ var io = (function () {
     return io;
 }());
 exports.io = io;
-var s = new io();
-s.profile("xlmnxp", "comments", function (err, res) {
-    if (err) {
-        console.log(err);
-    }
-    console.log(JSON.stringify(res, null, 4));
-});
 //# sourceMappingURL=hsoub.js.map

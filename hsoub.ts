@@ -332,7 +332,7 @@ export class io {
         });
         return this;
     }
-    // 
+    //
     // public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
     //   var req = request({
     //       url: `https://io.hsoub.com/go/${postId}`,
@@ -387,10 +387,11 @@ export class io {
     //   return this;
     // }
 }
-var s = new io();
-s.profile("xlmnxp","comments",(err,res)=>{
-  if(err){
-    console.log(err)
-  }
-  console.log(JSON.stringify(res,null,4));
-})
+// var s = new io();
+// s.profile("xlmnxp","comments",(err,res)=>{
+//   if(err){
+//     console.log(err)
+//     return;
+//   }
+//   console.log(JSON.stringify(res,null,4));
+// })
