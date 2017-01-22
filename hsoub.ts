@@ -64,14 +64,21 @@ export class io {
                     data;
                 if (searchIn.split("/")[0] == "comments") {
                     data = {
-                        post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
-                        post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
-                        comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
-                        comment_id: parseInt(item.id.replace("comment-", "")),
-                        comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
-                        community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
-                        community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
-                        community_url: (<string>item.querySelector(".post_community")["href"]).trim()
+                        post:{
+                          id: '',
+                          title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
+                          url: (<string>item.querySelector(".comment_post")["href"]).trim(),
+                        },
+                        comment: {
+                          id: parseInt(item.id.replace("comment-", "")),
+                          comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
+                          url: (<string>item.querySelector(".post-title a")["href"]).trim(),
+                        },
+                        community:{
+                          id: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
+                          name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
+                          url: (<string>item.querySelector(".post_community")["href"]).trim()
+                        }
                     };
                 } else if (searchIn.split("/")[0] == "communities") {
 
@@ -89,21 +96,28 @@ export class io {
                         username = username.split("<br >")[1];
                     }
                     data = {
-                        post_id: parseInt(item.id.replace("post-", "")),
-                        post_vote: (<string>item.querySelector(".post_points").innerHTML).trim(),
-                        post_title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
-                        post_url: (<string>item.querySelector(".postContent a")["href"]).trim(),
-                        user: (<string>item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
-                        user_name: username.trim(),
-                        user_image: (<string>item.querySelector(".usr26 img")["src"]).trim(),
-                        user_url: (<string>item.querySelector(".usr26")["href"]).trim(),
-                        community: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "")).trim(),
-                        community_name: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["innerHTML"].split(">")[2]).trim(),
-                        community_url: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"]).trim(),
+                        post:{
+                          id: parseInt(item.id.replace("post-", "")),
+                          vote: (<string>item.querySelector(".post_points").innerHTML).trim(),
+                          title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
+                          url: (<string>item.querySelector(".postContent a")["href"]).trim(),
+                        },
+                        user:{
+                          id:(<string>item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
+                          user: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
+                          name: username.trim(),
+                          avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
+                          url: (<string>item.querySelector(".usr26")["href"]).trim(),
+                        },
+                        community:{
+                          id: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "")).trim(),
+                          name: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["innerHTML"].split(">")[2]).trim(),
+                          url: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"]).trim(),
+                        },
                         commants_count: parseInt((commentsCounter).trim()),
                     };
                     if (item.querySelector(".post_image img") != undefined && item.querySelector(".post_image img") != null) {
-                        data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
+                        data.post["thumbnail"] = item.querySelector(".post_image img")["src"];
                     }
                 }
                 result.push(data)
@@ -127,46 +141,53 @@ export class io {
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result = {
-                    communityId: communityId,
-                    community_name: (<string>document.body.querySelector(".communities .block h2").innerHTML).trim(),
-                    community_url: "/" + communityId,
-                    community_about_url: "/" + communityId + "/about",
-                    community_followers: (<string>document.body.querySelector(".communities .communityFollower span").innerHTML).trim(),
-                    community_image: (<string>document.body.querySelector(".communities .block img")["src"]).trim(),
-                    community_description: (<string>document.body.querySelector(".communities .block p").innerHTML.split("<")[0]).trim(),
-                    community_lastcomments: [],
-                    community_best_contributors: [],
-                    community_owners: [],
-                    communitySubjects: [],
+                    id: communityId,
+                    name: (<string>document.body.querySelector(".communities .block h2").innerHTML).trim(),
+                    url: "/" + communityId,
+                    about_url: "/" + communityId + "/about",
+                    followers: (<string>document.body.querySelector(".communities .communityFollower span").innerHTML).trim(),
+                    image: (<string>document.body.querySelector(".communities .block img")["src"]).trim(),
+                    description: (<string>document.body.querySelector(".communities .block p").innerHTML.split("<")[0]).trim(),
+                    lastcomments: [],
+                    best_contributors: [],
+                    owners: [],
+                    subjects: [],
                 };
             var lastcomments: HTMLLIElement[] = document.body.querySelectorAll(".latestComments")[0].querySelectorAll("li");
             var best_contributors: HTMLLIElement[] = document.body.querySelectorAll(".latestComments")[1].querySelectorAll("li");
             var owners: HTMLLIElement[] = document.body.querySelectorAll(".latestComments")[2].querySelectorAll("li");
             for (let i = 0; i < lastcomments.length; i++) {
-                result.community_lastcomments.push({
-                    commentId: parseInt((<string>lastcomments[i].id.replace("latest_comment-", "")).trim()),
-                    user: decodeURIComponent((<string>lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", ""))).trim(),
-                    user_avatar: <string>lastcomments[i].querySelector("img")["src"],
-                    user_name: (<string>lastcomments[i].querySelector(".comTxt a").innerHTML).trim(),
-                    user_url: <string>lastcomments[i].querySelector(".comTxt a")["href"],
-                    comment: (<string>lastcomments[i].querySelector(".comTxt .commentTxt").innerHTML).trim(),
-                    comment_url: (<string>lastcomments[i].querySelector(".comTxt .commentTxt")["href"]).trim(),
+                result.lastcomments.push({
+                    comment:{
+                      id: parseInt((<string>lastcomments[i].id.replace("latest_comment-", "")).trim()),
+                      comment: (<string>lastcomments[i].querySelector(".comTxt .commentTxt").innerHTML).trim(),
+                      url: (<string>lastcomments[i].querySelector(".comTxt .commentTxt")["href"]).trim(),
+                    },
+                    user:{
+                      id: (<string>lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", "")).trim(),
+                      user: decodeURIComponent((<string>lastcomments[i].querySelector(".comTxt a")["href"].replace("/u/", ""))).trim(),
+                      name: (<string>lastcomments[i].querySelector(".comTxt a").innerHTML).trim(),
+                      avatar: <string>lastcomments[i].querySelector("img")["src"],
+                      url: <string>lastcomments[i].querySelector(".comTxt a")["href"],
+                    },
                 });
             }
             for (let i = 0; i < best_contributors.length; i++) {
-                result.community_best_contributors.push({
+                result.best_contributors.push({
+                    id:(<string>best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/","")).trim(),
                     user: decodeURIComponent((<string>best_contributors[i].querySelector(".comTxt div a.username")["href"].replace("/u/", "")).trim()),
-                    user_avatar: <string>best_contributors[i].querySelector("img")["src"],
-                    user_url: (<string>best_contributors[i].querySelector(".comTxt div a.username")["href"]).trim(),
-                    user_name: (<string>best_contributors[i].querySelector(".comTxt div a.username").innerHTML).trim(),
+                    name: (<string>best_contributors[i].querySelector(".comTxt div a.username").innerHTML).trim(),
+                    avatar: <string>best_contributors[i].querySelector("img")["src"],
+                    url: (<string>best_contributors[i].querySelector(".comTxt div a.username")["href"]).trim(),
                 });
             }
             for (let i = 0; i < owners.length; i++) {
-                result.community_owners.push({
+                result.owners.push({
+                    id:(<string>owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", "")).trim(),
                     user: decodeURIComponent((<string>owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", ""))).trim(),
-
-                    user_avatar: <string>owners[i].querySelector("img")["src"],
-                    user_name: (<string>owners[i].querySelector("span.full_name").innerHTML).trim(),
+                    avatar: <string>owners[i].querySelector("img")["src"],
+                    name: (<string>owners[i].querySelector("span.full_name").innerHTML).trim(),
+                    url: "/u/"+(<string>owners[i].querySelector(".userCardHeaderText a")["href"].replace("/u/", ""))
                 });
             }
 
@@ -184,23 +205,30 @@ export class io {
                     username = username.split("<br >")[1];
                 }
                 data = {
-                    post_id: parseInt(<string>item.id.replace("post-", "")),
-                    post_vote: parseInt((<string>item.querySelector(".post_points").innerHTML).trim()),
-                    post_title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
-                    post_url: (<string>item.querySelector(".postContent a")["href"]).trim(),
-                    user: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
-                    user_avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
-                    user_name: username.trim(),
-                    user_url: (<string>item.querySelector(".usr26")["href"]).trim(),
-                    community: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "")).trim(),
-                    community_name: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["innerHTML"].split(">")[2]).trim(),
-                    community_url: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"]).trim(),
+                    post:{
+                      id: parseInt(<string>item.id.replace("post-", "")),
+                      vote: parseInt((<string>item.querySelector(".post_points").innerHTML).trim()),
+                      title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
+                      url: (<string>item.querySelector(".postContent a")["href"]).trim(),
+                    },
+                    user:{
+                      id: (<string>item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
+                      user: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
+                      name: username.trim(),
+                      avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
+                      url: (<string>item.querySelector(".usr26")["href"]).trim(),
+                    },
+                    community:{
+                      id: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"].replace("/", "")).trim(),
+                      name: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["innerHTML"].split(">")[2]).trim(),
+                      url: (<string>item.querySelectorAll(".pull-right .lightBoxUserLnk")[1]["href"]).trim(),
+                    },
                     commants_count: parseInt((commentsCounter).trim()),
                 };
                 if (item.querySelector(".post_image img") != undefined && item.querySelector(".post_image img") != null) {
                     data["post_thumbnail"] = item.querySelector(".post_image img")["src"];
                 }
-                result.communitySubjects.push(data)
+                result.subjects.push(data)
                 if (i + 1 == elements.length) {
                     callback(null,result);
                     req.abort();
@@ -221,10 +249,10 @@ export class io {
             var document = Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result: JSON| any = {
-                  userId: userId,
+                  id: userId,
                   user: (<string>document.querySelector(".username").innerHTML).trim(),
-                  username: (<string>document.querySelector(".full_name").innerHTML).trim(),
-                  user_avatar: (<string>document.querySelector(".pull-right img")["src"]).trim(),
+                  name: (<string>document.querySelector(".full_name").innerHTML).trim(),
+                  avatar: (<string>document.querySelector(".pull-right img")["src"]).trim(),
                   points: parseInt((<string>document.querySelectorAll(".pull-right b")[0].innerHTML).trim()),
                   register_date: new Date(((<string>document.querySelectorAll(".pull-right b")[1].innerHTML).trim()).split("/").reverse().join("-")),
                   last_enter: (<string>document.querySelectorAll(".pull-right b")[2].innerHTML).trim(),
@@ -304,60 +332,60 @@ export class io {
         });
         return this;
     }
-
-    public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
-      var req = request({
-          url: `https://io.hsoub.com/go/${postId}`,
-          method: "get",
-      }, (err, res) => {
-          if (err) {
-              callback(err,null);
-          }
-          var document = Document(res.body);
-          var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
-              result: JSON| any = {
-                post: {
-                  id: parseInt(item.id.replace("post-", "")),
-                  likes: (<string>item.querySelector(".post_points").innerHTML).trim(),
-                  title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
-                  url: (<string>item.querySelector(".postContent a")["href"]).trim()
-                },
-                user: {
-                  id: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
-                  user: <string>''.trim(),
-                  name: <string>''.trim(),
-                  avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
-                  url: (<string>item.querySelector(".usr26")["href"]).trim(),
-                },
-                comments:[]
-              };
-          for (let i = 0; i < elements.length; i++) {
-              var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
-                  data;
-              //     data = {
-              //         post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
-              //         post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
-              //         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
-              //         comment_id: parseInt(item.id.replace("comment-", "")),
-              //         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
-              //         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
-              //         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
-              //         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
-              //     };
-              // result.comments.push(data)
-              if (i + 1 == elements.length) {
-                  callback(null,result);
-                  req.abort();
-              }
-          }
-      });
-      return this;
-    }
-
-    public comment(commentId, callback: (err: Error, results: JSON) => any):io{
-
-      return this;
-    }
+    // 
+    // public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
+    //   var req = request({
+    //       url: `https://io.hsoub.com/go/${postId}`,
+    //       method: "get",
+    //   }, (err, res) => {
+    //       if (err) {
+    //           callback(err,null);
+    //       }
+    //       var document = Document(res.body);
+    //       var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
+    //           result: JSON| any = {
+    //             post: {
+    //               id: parseInt(item.id.replace("post-", "")),
+    //               likes: (<string>item.querySelector(".post_points").innerHTML).trim(),
+    //               title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
+    //               url: (<string>item.querySelector(".postContent a")["href"]).trim()
+    //             },
+    //             user: {
+    //               id: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
+    //               user: <string>''.trim(),
+    //               name: <string>''.trim(),
+    //               avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
+    //               url: (<string>item.querySelector(".usr26")["href"]).trim(),
+    //             },
+    //             comments:[]
+    //           };
+    //       for (let i = 0; i < elements.length; i++) {
+    //           var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
+    //               data;
+    //           //     data = {
+    //           //         post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
+    //           //         post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
+    //           //         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
+    //           //         comment_id: parseInt(item.id.replace("comment-", "")),
+    //           //         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
+    //           //         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
+    //           //         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
+    //           //         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
+    //           //     };
+    //           // result.comments.push(data)
+    //           if (i + 1 == elements.length) {
+    //               callback(null,result);
+    //               req.abort();
+    //           }
+    //       }
+    //   });
+    //   return this;
+    // }
+    //
+    // public comment(commentId, callback: (err: Error, results: JSON) => any):io{
+    //
+    //   return this;
+    // }
 }
 var s = new io();
 s.profile("xlmnxp","comments",(err,res)=>{
