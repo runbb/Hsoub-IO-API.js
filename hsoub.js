@@ -276,10 +276,11 @@ var io = (function () {
                 id: userId,
                 user: document.querySelector(".username").innerHTML.trim(),
                 name: document.querySelector(".full_name").innerHTML.trim(),
-                avatar: document.querySelector(".pull-right img")["src"].trim(),
-                points: parseInt(document.querySelectorAll(".pull-right b")[0].innerHTML.trim()),
-                register_date: new Date((document.querySelectorAll(".pull-right b")[1].innerHTML.trim()).split("/").reverse().join("-")),
-                last_enter: document.querySelectorAll(".pull-right b")[2] ? document.querySelectorAll(".pull-right b")[2].innerHTML.trim() : undefined,
+                avatar: document.querySelector(".profileImg img")["src"].trim(),
+                description: document.querySelector(".profileDesc b").innerHTML.trim(),
+                points: document.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML.trim(),
+                register_date: new Date((document.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML.trim()).split("/").reverse().join("-")),
+                last_enter: document.querySelectorAll(".infoBlocks .contBlock")[2] ? document.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML.trim() : undefined,
                 results: []
             };
             if (elements.length == 0) {

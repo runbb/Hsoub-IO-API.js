@@ -281,10 +281,11 @@ export class io {
                     id: userId,
                     user: ( < string > document.querySelector(".username").innerHTML).trim(),
                     name: ( < string > document.querySelector(".full_name").innerHTML).trim(),
-                    avatar: ( < string > document.querySelector(".pull-right img")["src"]).trim(),
-                    points: parseInt(( < string > document.querySelectorAll(".pull-right b")[0].innerHTML).trim()),
-                    register_date: new Date((( < string > document.querySelectorAll(".pull-right b")[1].innerHTML).trim()).split("/").reverse().join("-")),
-                    last_enter: document.querySelectorAll(".pull-right b")[2] ? ( < string > document.querySelectorAll(".pull-right b")[2].innerHTML).trim() : undefined,
+                    avatar: ( < string > document.querySelector(".profileImg img")["src"]).trim(),
+                    description : ( < string > document.querySelector(".profileDesc b").innerHTML).trim(),
+                    points: ( < string > document.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML).trim(),
+                    register_date: new Date((( < string > document.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML).trim()).split("/").reverse().join("-")),
+                    last_enter: document.querySelectorAll(".infoBlocks .contBlock")[2] ? ( < string > document.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML).trim() : undefined,
                     results: []
                 };
             if (elements.length == 0) {
@@ -421,11 +422,12 @@ export class io {
     // }
 }
 // var s = new io();
-// s.profile("hsoubio", "new", (err, res) => {
+// s.profile("emadaboulfotoh",null, (err, res : JSON[]) => {
 //     if (err) {
 //         console.log(err)
 //         return;
 //     }
+//     //console.dir(res);
 //     res = res;
 //     console.log("\x1b[1mid\x1b[0m\t\t"+res.id);
 //     console.log("\x1b[1mname\x1b[0m\t\t"+res.name);
@@ -433,8 +435,8 @@ export class io {
 //     console.log("\x1b[1mregister date\x1b[0m\t"+res.register_date);
 //     console.log("-------------------------------------------------------")
 //     console.log("\x1b[1mid\x1b[0m\t| \x1b[1mcomments\x1b[0m\t| \x1b[1mtitle\x1b[0m");
-//     res.subjects.forEach(item => {
-//         if(res.subjects[0] == item){
+//     res.results.forEach(item => {
+//         if(res.results[0] == item){
 //           console.log("\x1b[5m" + item.post.id + "\x1b[0m" + "\t| " + "\x1b[5m" + item.commants_count + "\x1b[0m" + "\t\t| " + "\x1b[5m" + item.post.title + "\x1b[0m" );
 //         }else{
 //           console.log(item.post.id + "\t| " + item.commants_count + "\t\t| " + item.post.title );
