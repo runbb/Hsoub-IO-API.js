@@ -1,10 +1,10 @@
 "use strict";
-var request = require("request");
-var Document = require("jsdom").jsdom;
 var io = (function () {
     function io(email, password) {
         this.email = email;
         this.password = password;
+        this.Document = require("jsdom").jsdom;
+        this.request = require("request");
         if (email != null || password != null)
             this.login();
     }
@@ -18,6 +18,7 @@ var io = (function () {
     io.prototype.login = function () {
     };
     io.prototype.search = function (keywords, searchIn, callback) {
+        var _this = this;
         var search = keywords.join(" "), options;
         if (searchIn == null)
             searchIn = "";
@@ -57,14 +58,14 @@ var io = (function () {
         else {
             options = "";
         }
-        var req = request({
+        var req = this.request({
             url: "https://io.hsoub.com/search?utf8=" + encodeURIComponent("✓") + "&s=" + encodeURIComponent(search) + (options != null ? options : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = _this.Document(res.body);
             var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
             if (elements.length == 0) {
                 callback(null, result);
@@ -139,14 +140,15 @@ var io = (function () {
         return this;
     };
     io.prototype.community = function (communityId, searchIn, callback) {
-        var req = request({
+        var _this = this;
+        var req = this.request({
             url: "https://io.hsoub.com/" + communityId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = _this.Document(res.body);
             if (document.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
@@ -260,14 +262,15 @@ var io = (function () {
         return this;
     };
     io.prototype.profile = function (userId, searchIn, callback) {
-        var req = request({
+        var _this = this;
+        var req = this.request({
             url: "https://io.hsoub.com/u/" + userId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = _this.Document(res.body);
             if (document.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;

@@ -1,7 +1,7 @@
 declare var require;
-import request = require("request");
-const Document = require("jsdom").jsdom;
 export class io {
+    private Document = require("jsdom").jsdom;
+    private request = require("request");
     constructor(private email ? : string, private password ? : string) {
         if (email != null || password != null)
             this.login();
@@ -49,14 +49,14 @@ export class io {
         } else {
             options = "";
         }
-        var req = request({
+        var req = this.request({
             url: `https://io.hsoub.com/search?utf8=${encodeURIComponent("✓")}&s=${encodeURIComponent(search)}${options != null ? options : ""}`,
             method: "get",
         }, (err, res) => {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = this.Document(res.body);
             var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result: Array < JSON > = [];
             if (elements.length == 0) {
@@ -135,14 +135,14 @@ export class io {
     }
 
     public community(communityId: string, searchIn: string, callback: (err: Error, results: any) => any): io {
-        var req = request({
+        var req = this.request({
             url: `https://io.hsoub.com/${communityId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
         }, (err, res) => {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = this.Document(res.body);
             if (document.querySelector(".errorBox")){
               callback(new Error("404"),null);
               return;
@@ -264,14 +264,14 @@ export class io {
     }
 
     public profile(userId: string, searchIn: string | null, callback: (err: Error, results: Array < JSON > ) => any): io {
-        var req = request({
+        var req = this.request({
             url: `https://io.hsoub.com/u/${userId}${searchIn != null ? "/" + searchIn : ""}`,
             method: "get",
         }, (err, res) => {
             if (err) {
                 callback(err, null);
             }
-            var document = Document(res.body);
+            var document = this.Document(res.body);
             if (document.querySelector(".errorBox")){
               callback(new Error("404"),null);
               return;
