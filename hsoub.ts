@@ -1,4 +1,3 @@
-declare var require;
 export class io {
     private Document = require("jsdom").jsdom;
     private request = require("request");
@@ -6,7 +5,6 @@ export class io {
         if (email != null || password != null)
             this.login();
     }
-
     public get registerURL(): string {
         return "https://accounts.hsoub.com/register";
     }
@@ -366,56 +364,70 @@ export class io {
         });
         return this;
     }
-    //
-    // public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
-    //   var req = request({
-    //       url: `https://io.hsoub.com/go/${postId}`,
-    //       method: "get",
-    //   }, (err, res) => {
-    //       if (err) {
-    //           callback(err,null);
-    //       }
-    //       var document = Document(res.body);
-    //       var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
-    //           result: JSON| any = {
-    //             post: {
-    //               id: parseInt(item.id.replace("post-", "")),
-    //               likes: (<string>item.querySelector(".post_points").innerHTML).trim(),
-    //               title: (<string>item.querySelector(".postContent a").innerHTML).trim(),
-    //               url: (<string>item.querySelector(".postContent a")["href"]).trim()
-    //             },
-    //             user: {
-    //               id: decodeURIComponent((<string>item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
-    //               user: <string>''.trim(),
-    //               name: <string>''.trim(),
-    //               avatar: (<string>item.querySelector(".usr26 img")["src"]).trim(),
-    //               url: (<string>item.querySelector(".usr26")["href"]).trim(),
-    //             },
-    //             comments:[]
-    //           };
-    //       for (let i = 0; i < elements.length; i++) {
-    //           var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
-    //               data;
-    //           //     data = {
-    //           //         post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
-    //           //         post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
-    //           //         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
-    //           //         comment_id: parseInt(item.id.replace("comment-", "")),
-    //           //         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
-    //           //         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
-    //           //         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
-    //           //         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
-    //           //     };
-    //           // result.comments.push(data)
-    //           if (i + 1 == elements.length) {
-    //               callback(null,result);
-    //               req.abort();
-    //           }
-    //       }
-    //   });
-    //   return this;
-    // }
-    //
+
+    public post(postId: number, callback: (err: Error, results: Array<JSON>) => any):io{
+      var req = this.request({
+          url: `https://io.hsoub.com/go/${postId}`,
+          method: "get",
+      }, (err, res) => {
+          if (err) {
+              callback(err,null);
+          }
+          var document = this.Document(res.body);
+          var elements: NodeList = document.body.querySelector("#post_details").querySelectorAll("ul li"),
+              result: JSON| any = {
+                post: {
+                  id: postId,
+                  title: (<string>document.querySelector("#post_details .articleTitle a").innerHTML).trim(),
+                  contents: (<string>document.querySelector("#post_details .post_content").innerHTML),
+                  points: (<string>document.querySelector("#post_details .post_points").innerHTML).trim(),
+                  likes: (<string>document.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML).trim(),
+                  dislikes: (<string>document.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML).trim(),
+                  url: `https://io.hsoub.com/go/${postId}`
+                },
+                user: {
+                  id: decodeURIComponent((< string >document.querySelector("#post_details .usr26")["href"].replace("/u/", ""))).trim(),
+                  user: (< string >document.querySelector("#post_details .usr26 img")["alt"].split("-")[0]).trim(),
+                  name: (< string >document.querySelector("#post_details .usr26 img")["alt"].split("-")[1]).trim(),
+                  avatar: (< string >document.querySelector("#post_details .usr26 img")["src"]).trim(),
+                  url: (< string >document.querySelector("#post_details .usr26")["href"]).trim(),
+                },
+                community: {
+                  id: ( < string > document.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
+                  name: ( < string > document.querySelector(".shared_side_bar h2").innerHTML).trim(),
+                  description: ( < string > document.querySelector(".shared_side_bar .community-desc").innerHTML),
+                  url: ( < string > "/" + document.querySelector(".shared_side_bar .blockW div")["id"] ).trim(),
+                },
+                comments:[]
+              };
+          // console.log(` ----------[length][≈][${elements.length}]`);
+          if (elements.length == 0) {
+              callback(null, result);
+              req.abort();
+          }
+          for (let i = 0; i < elements.length; i++) {
+              var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
+                  data;
+              //     data = {
+              //         post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
+              //         post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
+              //         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
+              //         comment_id: parseInt(item.id.replace("comment-", "")),
+              //         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
+              //         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
+              //         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
+              //         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
+              //     };
+              // result.comments.push(data)
+              if (i + 1 == elements.length) {
+                  callback(null,result);
+                  req.abort();
+              }
+          }
+      });
+      return this;
+    }
+
     // public comment(commentId, callback: (err: Error, results: JSON) => any):io{
     //
     //   return this;

@@ -364,6 +364,55 @@ var io = (function () {
         });
         return this;
     };
+    io.prototype.post = function (postId, callback) {
+        var _this = this;
+        var req = this.request({
+            url: "https://io.hsoub.com/go/" + postId,
+            method: "get",
+        }, function (err, res) {
+            if (err) {
+                callback(err, null);
+            }
+            var document = _this.Document(res.body);
+            var elements = document.body.querySelector("#post_details").querySelectorAll("ul li"), result = {
+                post: {
+                    id: postId,
+                    title: document.querySelector("#post_details .articleTitle a").innerHTML.trim(),
+                    contents: document.querySelector("#post_details .post_content").innerHTML,
+                    points: document.querySelector("#post_details .post_points").innerHTML.trim(),
+                    likes: document.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML.trim(),
+                    dislikes: document.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML.trim(),
+                    url: "https://io.hsoub.com/go/" + postId
+                },
+                user: {
+                    id: decodeURIComponent(document.querySelector("#post_details .usr26")["href"].replace("/u/", "")).trim(),
+                    user: document.querySelector("#post_details .usr26 img")["alt"].split("-")[0].trim(),
+                    name: document.querySelector("#post_details .usr26 img")["alt"].split("-")[1].trim(),
+                    avatar: document.querySelector("#post_details .usr26 img")["src"].trim(),
+                    url: document.querySelector("#post_details .usr26")["href"].trim(),
+                },
+                community: {
+                    id: document.querySelector(".shared_side_bar .blockW div")["id"].trim(),
+                    name: document.querySelector(".shared_side_bar h2").innerHTML.trim(),
+                    description: document.querySelector(".shared_side_bar .community-desc").innerHTML,
+                    url: ("/" + document.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
+                },
+                comments: []
+            };
+            if (elements.length == 0) {
+                callback(null, result);
+                req.abort();
+            }
+            for (var i = 0; i < elements.length; i++) {
+                var item = elements[i], data;
+                if (i + 1 == elements.length) {
+                    callback(null, result);
+                    req.abort();
+                }
+            }
+        });
+        return this;
+    };
     return io;
 }());
 exports.io = io;
