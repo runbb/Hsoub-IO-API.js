@@ -1,6 +1,6 @@
 {
   "name": "hsoub",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Hsoub I/O API requests",
   "main": "hsoub.js",
   "dependencies": {
