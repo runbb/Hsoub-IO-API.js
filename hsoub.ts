@@ -374,7 +374,7 @@ export class io {
               callback(err,null);
           }
           var document = this.Document(res.body);
-          var elements: NodeList = document.body.querySelector("#post_details").querySelectorAll("ul li"),
+          var elements: NodeList = document.body.querySelector("#post-comments").querySelectorAll(".comment"),
               result: JSON| any = {
                 post: {
                   id: postId,
@@ -400,25 +400,32 @@ export class io {
                 },
                 comments:[]
               };
-          // console.log(` ----------[length][≈][${elements.length}]`);
           if (elements.length == 0) {
               callback(null, result);
               req.abort();
           }
+          console.log(elements.length);
           for (let i = 0; i < elements.length; i++) {
               var item: HTMLAnchorElement = <HTMLAnchorElement>elements[i],
                   data;
-              //     data = {
-              //         post_title: (<string>item.querySelector(".comment_post").innerHTML.split("\n")[2]).trim(),
-              //         post_url: (<string>item.querySelector(".comment_post")["href"]).trim(),
-              //         comment: (<string>item.querySelector(".post-title a").innerHTML).trim(),
-              //         comment_id: parseInt(item.id.replace("comment-", "")),
-              //         comment_url: (<string>item.querySelector(".post-title a")["href"]).trim(),
-              //         community: (<string>item.querySelector(".post_community")["href"].replace("/", "")).trim(),
-              //         community_name: (<string>item.querySelector(".post_community")["innerHTML"].split(">")[2]).trim(),
-              //         community_url: (<string>item.querySelector(".post_community")["href"]).trim()
-              //     };
-              // result.comments.push(data)
+                  if(true){
+                    data = {
+                      user:{
+                        id: (< string > item.querySelector("a.usr26")["href"]).replace("/u/","").trim(),
+                        user: (< string > item.querySelector(".postUsername").innerHTML).trim(),
+                        name: (< string > item.querySelector(".postUsername").innerHTML).trim(),
+                        avatar: (< string > item.querySelector("img")["src"]).trim(),
+                        url: (< string > item.querySelector("a.usr26")["href"]).trim(),
+                      },
+                      comment:{
+                        comment: (< string > item.querySelector(".commentContent").innerHTML).split("\n"),
+                        vote: (< number > parseInt(( < string > item.querySelector(".post_points").innerHTML).trim())),
+                        date: (< string > item.querySelectorAll(".pull-right span")[1].innerHTML.split("</i>")[1]).trim()
+                      },
+                      comments:[]
+                    };
+                    result.comments.push(data)
+                  }
               if (i + 1 == elements.length) {
                   callback(null,result);
                   req.abort();

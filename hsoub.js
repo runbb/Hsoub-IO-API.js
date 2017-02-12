@@ -374,7 +374,7 @@ var io = (function () {
                 callback(err, null);
             }
             var document = _this.Document(res.body);
-            var elements = document.body.querySelector("#post_details").querySelectorAll("ul li"), result = {
+            var elements = document.body.querySelector("#post-comments").querySelectorAll(".comment"), result = {
                 post: {
                     id: postId,
                     title: document.querySelector("#post_details .articleTitle a").innerHTML.trim(),
@@ -403,8 +403,27 @@ var io = (function () {
                 callback(null, result);
                 req.abort();
             }
+            console.log(elements.length);
             for (var i = 0; i < elements.length; i++) {
                 var item = elements[i], data;
+                if (true) {
+                    data = {
+                        user: {
+                            id: item.querySelector("a.usr26")["href"].replace("/u/", "").trim(),
+                            user: item.querySelector(".postUsername").innerHTML.trim(),
+                            name: item.querySelector(".postUsername").innerHTML.trim(),
+                            avatar: item.querySelector("img")["src"].trim(),
+                            url: item.querySelector("a.usr26")["href"].trim(),
+                        },
+                        comment: {
+                            comment: item.querySelector(".commentContent").innerHTML.split("\n"),
+                            vote: parseInt(item.querySelector(".post_points").innerHTML.trim()),
+                            date: item.querySelectorAll(".pull-right span")[1].innerHTML.split("</i>")[1].trim()
+                        },
+                        comments: []
+                    };
+                    result.comments.push(data);
+                }
                 if (i + 1 == elements.length) {
                     callback(null, result);
                     req.abort();
