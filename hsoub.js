@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var io = (function () {
     function io(email, password) {
         this.email = email;
@@ -159,7 +160,6 @@ var io = (function () {
                 url: "/" + communityId,
                 about_url: "/" + communityId + "/about",
                 followers: document.body.querySelector(".communityFollower span").innerHTML.trim(),
-                image: document.body.querySelector(".block img")["src"].trim(),
                 description: document.body.querySelector(".block p").innerHTML.split("<")[0].trim(),
                 lastcomments: [],
                 best_contributors: [],
@@ -378,7 +378,7 @@ var io = (function () {
                 post: {
                     id: postId,
                     title: document.querySelector("#post_details .articleTitle a").innerHTML.trim(),
-                    contents: document.querySelector("#post_details .post_content").innerHTML,
+                    content: document.querySelector("#post_details .post_content").innerHTML,
                     points: document.querySelector("#post_details .post_points").innerHTML.trim(),
                     likes: document.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML.trim(),
                     dislikes: document.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML.trim(),
@@ -386,8 +386,7 @@ var io = (function () {
                 },
                 user: {
                     id: decodeURIComponent(document.querySelector("#post_details .usr26")["href"].replace("/u/", "")).trim(),
-                    user: document.querySelector("#post_details .usr26 img")["alt"].split("-")[0].trim(),
-                    name: document.querySelector("#post_details .usr26 img")["alt"].split("-")[1].trim(),
+                    user: document.querySelector("#post_details .usr26 .postUsername").innerHTML.trim(),
                     avatar: document.querySelector("#post_details .usr26 img")["src"].trim(),
                     url: document.querySelector("#post_details .usr26")["href"].trim(),
                 },
@@ -411,12 +410,11 @@ var io = (function () {
                         user: {
                             id: item.querySelector("a.usr26")["href"].replace("/u/", "").trim(),
                             user: item.querySelector(".postUsername").innerHTML.trim(),
-                            name: item.querySelector(".postUsername").innerHTML.trim(),
                             avatar: item.querySelector("img")["src"].trim(),
                             url: item.querySelector("a.usr26")["href"].trim(),
                         },
                         comment: {
-                            comment: item.querySelector(".commentContent").innerHTML.split("\n"),
+                            content: item.querySelector(".commentContent").innerHTML,
                             vote: parseInt(item.querySelector(".post_points").innerHTML.trim()),
                             date: item.querySelectorAll(".pull-right span")[1].innerHTML.split("</i>")[1].trim()
                         },
