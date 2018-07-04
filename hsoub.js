@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var io = (function () {
+var jsdom_1 = require("jsdom");
+var request = require("request");
+var io = /** @class */ (function () {
     function io(email, password) {
         this.email = email;
         this.password = password;
-        this.Document = require("jsdom").jsdom;
-        this.request = require("request");
         if (email != null || password != null)
             this.login();
     }
@@ -19,7 +19,6 @@ var io = (function () {
     io.prototype.login = function () {
     };
     io.prototype.search = function (keywords, searchIn, callback) {
-        var _this = this;
         var search = keywords.join(" "), options;
         if (searchIn == null)
             searchIn = "";
@@ -59,15 +58,15 @@ var io = (function () {
         else {
             options = "";
         }
-        var req = this.request({
+        var req = request({
             url: "https://io.hsoub.com/search?utf8=" + encodeURIComponent("✓") + "&s=" + encodeURIComponent(search) + (options != null ? options : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = _this.Document(res.body);
-            var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
+            var activeDocument = jsdom_1.jsdom(res.body);
+            var elements = activeDocument.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
             if (elements.length == 0) {
                 callback(null, result);
                 req.abort();
@@ -104,7 +103,7 @@ var io = (function () {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >")[1];
+                        username = username.split("<br>")[1];
                     }
                     data = {
                         post: {
@@ -141,32 +140,31 @@ var io = (function () {
         return this;
     };
     io.prototype.community = function (communityId, searchIn, callback) {
-        var _this = this;
-        var req = this.request({
+        var req = request({
             url: "https://io.hsoub.com/" + communityId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = _this.Document(res.body);
-            if (document.querySelector(".errorBox")) {
+            var activeDocument = jsdom_1.jsdom(res.body);
+            if (activeDocument.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
             }
-            var elements = document.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
+            var elements = activeDocument.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
                 id: communityId,
-                name: document.querySelector(".block h2.underline").innerHTML.trim(),
+                name: activeDocument.querySelector(".block h2.underline").innerHTML.trim(),
                 url: "/" + communityId,
                 about_url: "/" + communityId + "/about",
-                followers: document.body.querySelector(".communityFollower span").innerHTML.trim(),
-                description: document.body.querySelector(".block p").innerHTML.split("<")[0].trim(),
+                followers: activeDocument.body.querySelector(".communityFollower span").innerHTML.trim(),
+                description: activeDocument.body.querySelector(".block p").innerHTML.split("<")[0].trim(),
                 lastcomments: [],
                 best_contributors: [],
                 owners: [],
                 subjects: [],
             };
-            var query = document.querySelectorAll(".latestComments");
+            var query = activeDocument.querySelectorAll(".latestComments");
             var lastcomments;
             var best_contributors;
             var owners;
@@ -226,7 +224,7 @@ var io = (function () {
                     .replace("تعليق", "")
                     .replace("</a", "");
                 if (username.match(/\<br \>/g)) {
-                    username = username.split("<br >")[1];
+                    username = username.split("<br>")[1];
                 }
                 data = {
                     post: {
@@ -262,28 +260,27 @@ var io = (function () {
         return this;
     };
     io.prototype.profile = function (userId, searchIn, callback) {
-        var _this = this;
-        var req = this.request({
+        var req = request({
             url: "https://io.hsoub.com/u/" + userId + (searchIn != null ? "/" + searchIn : ""),
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = _this.Document(res.body);
-            if (document.querySelector(".errorBox")) {
+            var activeDocument = jsdom_1.jsdom(res.body);
+            if (activeDocument.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
             }
-            var elements = document.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
+            var elements = activeDocument.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = {
                 id: userId,
-                user: document.querySelector(".username").innerHTML.trim(),
-                name: document.querySelector(".full_name").innerHTML.trim(),
-                avatar: document.querySelector(".profileImg img")["src"].trim(),
-                description: document.querySelector(".profileDesc p").innerHTML.trim(),
-                points: document.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML.trim(),
-                register_date: new Date((document.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML.trim()).split("/").reverse().join("-")),
-                last_enter: document.querySelectorAll(".infoBlocks .contBlock")[2] ? document.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML.trim() : undefined,
+                user: activeDocument.querySelector(".username").innerHTML.trim(),
+                name: activeDocument.querySelector(".full_name").innerHTML.trim(),
+                avatar: activeDocument.querySelector(".profileImg img")["src"].trim(),
+                description: activeDocument.querySelector(".profileDesc p").innerHTML.trim(),
+                points: activeDocument.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML.trim(),
+                register_date: new Date((activeDocument.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML.trim()).split("/").reverse().join("-")),
+                last_enter: activeDocument.querySelectorAll(".infoBlocks .contBlock")[2] ? activeDocument.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML.trim() : undefined,
                 results: []
             };
             if (elements.length == 0) {
@@ -306,9 +303,9 @@ var io = (function () {
                         },
                         user: {
                             id: userId,
-                            user: document.querySelector(".username").innerHTML.trim(),
-                            name: document.querySelector(".full_name").innerHTML.trim(),
-                            avatar: document.querySelector(".pull-right img")["src"].trim(),
+                            user: activeDocument.querySelector(".username").innerHTML.trim(),
+                            name: activeDocument.querySelector(".full_name").innerHTML.trim(),
+                            avatar: activeDocument.querySelector(".pull-right img")["src"].trim(),
                             url: "/u/" + userId,
                         },
                         community: {
@@ -328,7 +325,7 @@ var io = (function () {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >");
+                        username = username.split("<br>");
                     }
                     data = {
                         post: {
@@ -339,8 +336,8 @@ var io = (function () {
                         },
                         user: {
                             id: decodeURIComponent(item.querySelector(".usr26")["href"].replace("/u/", "")).trim(),
-                            user: document.querySelector(".username").innerHTML.trim(),
-                            name: document.querySelector(".full_name").innerHTML.trim(),
+                            user: activeDocument.querySelector(".username").innerHTML.trim(),
+                            name: activeDocument.querySelector(".full_name").innerHTML.trim(),
                             avatar: item.querySelector(".usr26 img")["src"].trim(),
                             url: item.querySelector(".usr26")["href"].trim(),
                         },
@@ -365,36 +362,35 @@ var io = (function () {
         return this;
     };
     io.prototype.post = function (postId, callback) {
-        var _this = this;
-        var req = this.request({
+        var req = request({
             url: "https://io.hsoub.com/go/" + postId,
             method: "get",
         }, function (err, res) {
             if (err) {
                 callback(err, null);
             }
-            var document = _this.Document(res.body);
-            var elements = document.body.querySelector("#post-comments").querySelectorAll(".comment"), result = {
+            var activeDocument = jsdom_1.jsdom(res.body);
+            var elements = activeDocument.body.querySelector("#post-comments").querySelectorAll(".comment"), result = {
                 post: {
                     id: postId,
-                    title: document.querySelector("#post_details .articleTitle a").innerHTML.trim(),
-                    content: document.querySelector("#post_details .post_content").innerHTML,
-                    points: document.querySelector("#post_details .post_points").innerHTML.trim(),
-                    likes: document.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML.trim(),
-                    dislikes: document.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML.trim(),
+                    title: activeDocument.querySelector("#post_details .articleTitle a").innerHTML.trim(),
+                    content: activeDocument.querySelector("#post_details .post_content").innerHTML,
+                    points: activeDocument.querySelector("#post_details .post_points").innerHTML.trim(),
+                    likes: activeDocument.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML.trim(),
+                    dislikes: activeDocument.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML.trim(),
                     url: "https://io.hsoub.com/go/" + postId
                 },
                 user: {
-                    id: decodeURIComponent(document.querySelector("#post_details .usr26")["href"].replace("/u/", "")).trim(),
-                    user: document.querySelector("#post_details .usr26 .postUsername").innerHTML.trim(),
-                    avatar: document.querySelector("#post_details .usr26 img")["src"].trim(),
-                    url: document.querySelector("#post_details .usr26")["href"].trim(),
+                    id: decodeURIComponent(activeDocument.querySelector("#post_details .usr26")["href"].replace("/u/", "")).trim(),
+                    user: activeDocument.querySelector("#post_details .usr26 .postUsername").innerHTML.trim(),
+                    avatar: activeDocument.querySelector("#post_details .usr26 img")["src"].trim(),
+                    url: activeDocument.querySelector("#post_details .usr26")["href"].trim(),
                 },
                 community: {
-                    id: document.querySelector(".shared_side_bar .blockW div")["id"].trim(),
-                    name: document.querySelector(".shared_side_bar h2").innerHTML.trim(),
-                    description: document.querySelector(".shared_side_bar .community-desc").innerHTML,
-                    url: ("/" + document.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
+                    id: activeDocument.querySelector(".shared_side_bar .blockW div")["id"].trim(),
+                    name: activeDocument.querySelector(".shared_side_bar h2").innerHTML.trim(),
+                    description: activeDocument.querySelector(".shared_side_bar .community-desc").innerHTML,
+                    url: ("/" + activeDocument.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
                 },
                 comments: []
             };

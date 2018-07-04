@@ -57,7 +57,7 @@ export class io {
 
     }
 
-    public search(keywords: Array<string > , searchIn: string, callback: (err: Error, results: Array < JSON> ) => any): io {
+    public search(keywords: Array<string> , searchIn: string, callback: (err: Error, results: Array < JSON> ) => any): io {
         var search: string = keywords.join(" "),
             options;
         if (searchIn == null) searchIn = "";
@@ -98,15 +98,15 @@ export class io {
             if (err) {
                 callback(err, null);
             }
-            var document = document(res.body);
-            var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
+            var activeDocument = document(res.body);
+            var elements: NodeList = activeDocument.body.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result: Array<JSON> = [];
             if (elements.length == 0) {
                 callback(null, result);
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
-                var item: HTMLAnchorElement =<HTMLAnchorElement> elements[i],
+                var item: HTMLAnchorElement = <HTMLAnchorElement> elements[i],
                     data;
                 if (searchIn.split("/")[0] == "comments") {
                     data = {
@@ -129,9 +129,9 @@ export class io {
                 } else if (searchIn.split("/")[0] == "communities") {
 
                 } else {
-                    var username: String =<string> item.querySelector(".usr26 img")["alt"],
+                    var username: String = <string> item.querySelector(".usr26 img")["alt"],
 
-                        commentsCounter =<string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
+                        commentsCounter = <string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
                         .replace("تعليق واحد", "1")
                         .replace("تعليقان", "2")
                         .replace("تعليقات", "")
@@ -139,7 +139,7 @@ export class io {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >")[1];
+                        username = username.split("<br>")[1];
                     }
                     data = {
                         post: {
@@ -184,28 +184,29 @@ export class io {
             if (err) {
                 callback(err, null);
             }
-            var document = document(res.body);
-            if (document.querySelector(".errorBox")) {
+            var activeDocument = document(res.body);
+            if (activeDocument.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
             }
-            var elements: NodeList = document.querySelector(".itemsList").querySelectorAll(".listItem"),
+            var elements: NodeList = activeDocument.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result = {
                     id: communityId,
-                    name: (<string> document.querySelector(".block h2.underline").innerHTML).trim(),
+                    name: (<string> activeDocument.querySelector(".block h2.underline").innerHTML).trim(),
                     url: "/" + communityId,
                     about_url: "/" + communityId + "/about",
-                    followers: (<string> document.body.querySelector(".communityFollower span").innerHTML).trim(),
-                    description: (<string> document.body.querySelector(".block p").innerHTML.split("<")[0]).trim(),
+                    followers: (<string> activeDocument.body.querySelector(".communityFollower span").innerHTML).trim(),
+                    description: (<string> activeDocument.body.querySelector(".block p").innerHTML.split("<")[0]).trim(),
                     lastcomments: [],
                     best_contributors: [],
                     owners: [],
                     subjects: [],
                 };
-            var query = document.querySelectorAll(".latestComments");
-            var lastcomments: HTMLLIElement[];
-            var best_contributors: HTMLLIElement[];
-            var owners: HTMLLIElement[];
+            
+            var query = activeDocument.querySelectorAll(".latestComments");
+            var lastcomments: NodeListOf<HTMLLIElement>;
+            var best_contributors: NodeListOf<HTMLLIElement>;
+            var owners: NodeListOf<HTMLLIElement>;
 
             if (query.length >= 1) {
                 lastcomments = query[0].querySelectorAll("li");
@@ -258,9 +259,9 @@ export class io {
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
-                var item: HTMLAnchorElement =<HTMLAnchorElement> elements[i],
-                    username: String =<string> item.querySelector(".usr26 img")["alt"],
-                    data, commentsCounter =<string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
+                var item: HTMLAnchorElement = <HTMLAnchorElement> elements[i],
+                    username: String = <string> item.querySelector(".usr26 img")["alt"],
+                    data, commentsCounter = <string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
                     .replace("تعليق واحد", "1")
                     .replace("تعليقان", "2")
                     .replace("تعليقات", "")
@@ -268,7 +269,7 @@ export class io {
                     .replace("تعليق", "")
                     .replace("</a", "");
                 if (username.match(/\<br \>/g)) {
-                    username = username.split("<br >")[1];
+                    username = username.split("<br>")[1];
                 }
                 data = {
                     post: {
@@ -312,21 +313,21 @@ export class io {
             if (err) {
                 callback(err, null);
             }
-            var document = document(res.body);
-            if (document.querySelector(".errorBox")) {
+            var activeDocument = document(res.body);
+            if (activeDocument.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
             }
-            var elements: NodeList = document.body.querySelector(".itemsList").querySelectorAll(".listItem"),
+            var elements: NodeList = activeDocument.body.querySelector(".itemsList").querySelectorAll(".listItem"),
                 result: JSON | any = {
                     id: userId,
-                    user: (<string> document.querySelector(".username").innerHTML).trim(),
-                    name: (<string> document.querySelector(".full_name").innerHTML).trim(),
-                    avatar: (<string> document.querySelector(".profileImg img")["src"]).trim(),
-                    description: (<string> document.querySelector(".profileDesc p").innerHTML).trim(),
-                    points: (<string> document.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML).trim(),
-                    register_date: new Date(((<string> document.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML).trim()).split("/").reverse().join("-")),
-                    last_enter: document.querySelectorAll(".infoBlocks .contBlock")[2] ? (<string> document.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML).trim() : undefined,
+                    user: (<string> activeDocument.querySelector(".username").innerHTML).trim(),
+                    name: (<string> activeDocument.querySelector(".full_name").innerHTML).trim(),
+                    avatar: (<string> activeDocument.querySelector(".profileImg img")["src"]).trim(),
+                    description: (<string> activeDocument.querySelector(".profileDesc p").innerHTML).trim(),
+                    points: (<string> activeDocument.querySelectorAll(".infoBlocks .contBlock")[0].querySelector("b").innerHTML).trim(),
+                    register_date: new Date(((<string> activeDocument.querySelectorAll(".infoBlocks .contBlock")[1].querySelector("b").innerHTML).trim()).split("/").reverse().join("-")),
+                    last_enter: activeDocument.querySelectorAll(".infoBlocks .contBlock")[2] ? (<string> activeDocument.querySelectorAll(".infoBlocks .contBlock")[2].querySelector("b").innerHTML).trim() : undefined,
                     results: []
                 };
             if (elements.length == 0) {
@@ -334,7 +335,7 @@ export class io {
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
-                var item: HTMLAnchorElement =<HTMLAnchorElement> elements[i],
+                var item: HTMLAnchorElement = <HTMLAnchorElement> elements[i],
                     data;
                 if (searchIn == "comments") {
                     data = {
@@ -350,9 +351,9 @@ export class io {
                         },
                         user: {
                             id: userId,
-                            user: (<string> document.querySelector(".username").innerHTML).trim(),
-                            name: (<string> document.querySelector(".full_name").innerHTML).trim(),
-                            avatar: (<string> document.querySelector(".pull-right img")["src"]).trim(),
+                            user: (<string> activeDocument.querySelector(".username").innerHTML).trim(),
+                            name: (<string> activeDocument.querySelector(".full_name").innerHTML).trim(),
+                            avatar: (<string> activeDocument.querySelector(".pull-right img")["src"]).trim(),
                             url: "/u/" + userId,
                         },
                         community: {
@@ -362,8 +363,8 @@ export class io {
                         },
                     };
                 } else {
-                    var username: any =<string> item.querySelector(".usr26 img")["alt"];
-                    var commentsCounter =<string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
+                    var username: any = <string> item.querySelector(".usr26 img")["alt"];
+                    var commentsCounter = <string> item.querySelector(".commentsCounter")["innerHTML"].split(">")[3]
                         .replace("تعليق واحد", "1")
                         .replace("تعليقان", "2")
                         .replace("تعليقات", "")
@@ -371,7 +372,7 @@ export class io {
                         .replace("تعليق", "")
                         .replace("</a", "");
                     if (username.match(/\<br \>/g)) {
-                        username = username.split("<br >");
+                        username = username.split("<br>");
                     }
                     data = {
                         post: {
@@ -382,8 +383,8 @@ export class io {
                         },
                         user: {
                             id: decodeURIComponent((<string> item.querySelector(".usr26")["href"].replace("/u/", ""))).trim(),
-                            user: (<string> document.querySelector(".username").innerHTML).trim(),
-                            name: (<string> document.querySelector(".full_name").innerHTML).trim(),
+                            user: (<string> activeDocument.querySelector(".username").innerHTML).trim(),
+                            name: (<string> activeDocument.querySelector(".full_name").innerHTML).trim(),
                             avatar: (<string> item.querySelector(".usr26 img")["src"]).trim(),
                             url: (<string> item.querySelector(".usr26")["href"]).trim(),
                         },
@@ -416,29 +417,29 @@ export class io {
             if (err) {
                 callback(err, null);
             }
-            var document = document(res.body);
-            var elements: NodeList = document.body.querySelector("#post-comments").querySelectorAll(".comment"),
+            var activeDocument = document(res.body);
+            var elements: NodeList = activeDocument.body.querySelector("#post-comments").querySelectorAll(".comment"),
                 result: JSON | any = {
                     post: {
                         id: postId,
-                        title: (<string> document.querySelector("#post_details .articleTitle a").innerHTML).trim(),
-                        content: (<string> document.querySelector("#post_details .post_content").innerHTML),
-                        points: (<string> document.querySelector("#post_details .post_points").innerHTML).trim(),
-                        likes: (<string> document.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML).trim(),
-                        dislikes: (<string> document.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML).trim(),
+                        title: (<string> activeDocument.querySelector("#post_details .articleTitle a").innerHTML).trim(),
+                        content: (<string> activeDocument.querySelector("#post_details .post_content").innerHTML),
+                        points: (<string> activeDocument.querySelector("#post_details .post_points").innerHTML).trim(),
+                        likes: (<string> activeDocument.querySelectorAll("#post_details .pointsDetails a")[0].innerHTML).trim(),
+                        dislikes: (<string> activeDocument.querySelectorAll("#post_details .pointsDetails a")[1].innerHTML).trim(),
                         url: `https://io.hsoub.com/go/${postId}`
                     },
                     user: {
-                        id: decodeURIComponent((<string> document.querySelector("#post_details .usr26")["href"].replace("/u/", ""))).trim(),
-                        user: (<string> document.querySelector("#post_details .usr26 .postUsername").innerHTML).trim(),
-                        avatar: (<string> document.querySelector("#post_details .usr26 img")["src"]).trim(),
-                        url: (<string> document.querySelector("#post_details .usr26")["href"]).trim(),
+                        id: decodeURIComponent((<string> activeDocument.querySelector("#post_details .usr26")["href"].replace("/u/", ""))).trim(),
+                        user: (<string> activeDocument.querySelector("#post_details .usr26 .postUsername").innerHTML).trim(),
+                        avatar: (<string> activeDocument.querySelector("#post_details .usr26 img")["src"]).trim(),
+                        url: (<string> activeDocument.querySelector("#post_details .usr26")["href"]).trim(),
                     },
                     community: {
-                        id: (<string> document.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
-                        name: (<string> document.querySelector(".shared_side_bar h2").innerHTML).trim(),
-                        description: (<string> document.querySelector(".shared_side_bar .community-desc").innerHTML),
-                        url: (<string> "/" + document.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
+                        id: (<string> activeDocument.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
+                        name: (<string> activeDocument.querySelector(".shared_side_bar h2").innerHTML).trim(),
+                        description: (<string> activeDocument.querySelector(".shared_side_bar .community-desc").innerHTML),
+                        url: (<string> "/" + activeDocument.querySelector(".shared_side_bar .blockW div")["id"]).trim(),
                     },
                     comments: []
                 };
@@ -448,7 +449,7 @@ export class io {
             }
             console.log(elements.length);
             for (let i = 0; i < elements.length; i++) {
-                var item: HTMLAnchorElement =<HTMLAnchorElement> elements[i],
+                var item: HTMLAnchorElement = <HTMLAnchorElement> elements[i],
                     data;
                 if (true) {
                     data = {
@@ -460,7 +461,7 @@ export class io {
                         },
                         comment: {
                             content:<string> item.querySelector(".commentContent").innerHTML,
-                            vote: (<number > parseInt(( < string> item.querySelector(".post_points").innerHTML).trim())),
+                            vote: (<number> parseInt(( < string> item.querySelector(".post_points").innerHTML).trim())),
                             date: (<string> item.querySelectorAll(".pull-right span")[1].innerHTML.split("</i>")[1]).trim()
                         },
                         comments: []
