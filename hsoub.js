@@ -69,6 +69,7 @@ var io = /** @class */ (function () {
             var elements = activeDocument.body.querySelector(".itemsList").querySelectorAll(".listItem"), result = [];
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (var i = 0; i < elements.length; i++) {
@@ -133,6 +134,7 @@ var io = /** @class */ (function () {
                 result.push(data);
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -213,6 +215,7 @@ var io = /** @class */ (function () {
             }
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (var i = 0; i < elements.length; i++) {
@@ -253,6 +256,7 @@ var io = /** @class */ (function () {
                 result.subjects.push(data);
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -285,6 +289,7 @@ var io = /** @class */ (function () {
             };
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (var i = 0; i < elements.length; i++) {
@@ -355,6 +360,7 @@ var io = /** @class */ (function () {
                 result.results.push(data);
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -396,6 +402,7 @@ var io = /** @class */ (function () {
             };
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             console.log(elements.length);
@@ -420,6 +427,7 @@ var io = /** @class */ (function () {
                 }
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }

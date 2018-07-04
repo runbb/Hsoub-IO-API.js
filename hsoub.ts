@@ -103,6 +103,7 @@ export class io {
                 result: Array<JSON> = [];
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
@@ -169,6 +170,7 @@ export class io {
                 result.push(data)
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -256,6 +258,7 @@ export class io {
             }
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
@@ -298,6 +301,7 @@ export class io {
                 result.subjects.push(data)
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -314,6 +318,7 @@ export class io {
                 callback(err, null);
             }
             var activeDocument = document(res.body);
+            
             if (activeDocument.querySelector(".errorBox")) {
                 callback(new Error("404"), null);
                 return;
@@ -332,6 +337,7 @@ export class io {
                 };
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             for (let i = 0; i < elements.length; i++) {
@@ -402,6 +408,7 @@ export class io {
                 result.results.push(data)
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
@@ -445,6 +452,7 @@ export class io {
                 };
             if (elements.length == 0) {
                 callback(null, result);
+                activeDocument.defaultView.close();
                 req.abort();
             }
             console.log(elements.length);
@@ -470,6 +478,7 @@ export class io {
                 }
                 if (i + 1 == elements.length) {
                     callback(null, result);
+                    activeDocument.defaultView.close();
                     req.abort();
                 }
             }
